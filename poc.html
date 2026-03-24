@@ -1,16 +1,26 @@
+<!-- Open Redirect PoC Code -->
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Redirect PoC</title>
-    <script>
-        window.onload = function() {
-            window.location.href = 'https://eo74rbqu36go8g.m.pipedream.net?sha=5f127ddc3ee933413d77e9a4aee4779c7a297bab';
-        };
-    </script>
+    <title>Open Redirect PoC</title>
 </head>
 <body>
-    <h1>If you are not redirected, please <a href="https://eo74rbqu36go8g.m.pipedream.net?sha=5f127ddc3ee933413d77e9a4aee4779c7a297bab">click here</a>.</h1>
+    <h1>Open Redirect Demonstration</h1>
+    <p>This PoC demonstrates an open redirect vulnerability.</p>
+    <script>
+        // Automatic redirect trigger
+        function redirect(url) {
+            // Manipulating the Referer header using Pipedream integration
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.setRequestHeader('Referer', 'https://malicious-site.com');
+            xhr.send();
+        }
+
+        // Triggering the redirect with an attack flow
+        const targetUrl = 'https://example.com'; // Change to the target URL
+        redirect(targetUrl);
+    </script>
 </body>
 </html>
